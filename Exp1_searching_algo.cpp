@@ -1,7 +1,6 @@
 #include <iostream>
-
+#include <algorithm>
 using namespace std;
-
 class Searching
 {
     int a[100];
@@ -150,6 +149,84 @@ public:
              << " | Comparisons: " << comparisons
              << " | Iterations: " << iterations << endl;
     }
+
+    // 4. Fibonacci Search
+void fibonacciSearch(int key)
+{
+    int fib2 = 0;
+    int fib1 = 1;
+    int fib = fib1 + fib2;
+
+    int comparisons = 0;
+    int iterations = 0;
+
+    // Find the smallest Fibonacci number greater than or equal to n
+    while (fib < n)
+    {
+        fib2 = fib1;
+        fib1 = fib;
+        fib = fib1 + fib2;
+    }
+
+    int offset = -1;
+
+    while (fib > 1)
+    {
+        iterations++;
+
+        int i = min(offset + fib2, n - 1);
+
+        comparisons++;
+
+        if (a[i] < key)
+        {
+            comparisons++;
+
+            fib = fib1;
+            fib1 = fib2;
+            fib2 = fib - fib1;
+            offset = i;
+        }
+        else if (a[i] > key)
+        {
+            comparisons++;
+
+            fib = fib2;
+            fib1 = fib1 - fib2;
+            fib2 = fib - fib1;
+        }
+        else
+        {
+            cout << "Fibonacci Search: Found"
+                 << " | Index: " << i
+                 << " | Comparisons: " << comparisons
+                 << " | Iterations: " << iterations << endl;
+
+            return;
+        }
+    }
+
+    // Check the final possible element
+    if (fib1 && offset + 1 < n)
+    {
+        comparisons++;
+        iterations++;
+
+        if (a[offset + 1] == key)
+        {
+            cout << "Fibonacci Search: Found"
+                 << " | Index: " << offset + 1
+                 << " | Comparisons: " << comparisons
+                 << " | Iterations: " << iterations << endl;
+
+            return;
+        }
+    }
+
+    cout << "Fibonacci Search: Not Found"
+         << " | Comparisons: " << comparisons
+         << " | Iterations: " << iterations << endl;
+}
 };
 
 int main()
@@ -171,6 +248,7 @@ int main()
     s.linearSearch(key);
     s.sentinelSearch(key);
     s.binarySearch(key);
+    s.fibonacciSearch(key);
 
     return 0;
 }

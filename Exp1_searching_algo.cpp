@@ -1,11 +1,13 @@
 #include <iostream>
 #include <string>
+#include <algorithm>
 using namespace std;
 
 struct Item
 {
-    string name;
+    int code;
     int price;
+    string name;
 };
 
 struct Searching
@@ -14,21 +16,23 @@ struct Searching
     int n;
 
     void input()
-{
-    cout << "Enter number of items: ";
-    cin >> n;
-
-    for (int i = 0; i < n; i++)
     {
-        cin.ignore();
+        cout << "Enter number of items: ";
+        cin >> n;
 
-        cout << "\nEnter item name: ";
-        getline(cin, a[i].name);
+        for (int i = 0; i < n; i++)
+        {
+            cout << "\nEnter product code: ";
+            cin >> a[i].code;
 
-        cout << "Enter price: ";
-        cin >> a[i].price;
+            cout << "Enter product name: ";
+            cin.ignore();
+            getline(cin, a[i].name);
+
+            cout << "Enter price: ";
+            cin >> a[i].price;
+        }
     }
-}
 
     void sortArray()
     {
@@ -36,7 +40,7 @@ struct Searching
         {
             for (int j = 0; j < n - i - 1; j++)
             {
-                if (a[j].price > a[j + 1].price)
+                if (a[j].code > a[j + 1].code)
                 {
                     Item temp = a[j];
                     a[j] = a[j + 1];
@@ -52,9 +56,9 @@ struct Searching
 
         for (int i = 0; i < n; i++)
         {
-            cout << i << ". "
-                 << a[i].name
-                 << " - Rs." << a[i].price << endl;
+            cout << "Code: " << a[i].code
+                 << " | Name: " << a[i].name
+                 << " | Price: Rs." << a[i].price << endl;
         }
     }
 
@@ -63,11 +67,10 @@ struct Searching
     {
         for (int i = 0; i < n; i++)
         {
-            if (a[i].price == key)
+            if (a[i].code == key)
             {
-                cout << "Linear Search: Found "
-                     << a[i].name
-                     << " at index " << i << endl;
+                cout << "Linear Search: Found | "
+                     << a[i].name << " | Rs." << a[i].price << endl;
                 return;
             }
         }
@@ -79,13 +82,13 @@ struct Searching
     void sentinelSearch(int key)
     {
         Item last = a[n - 1];
-        a[n - 1].price = key;
+        a[n - 1].code = key;
 
         int i = 0;
 
         while (true)
         {
-            if (a[i].price == key)
+            if (a[i].code == key)
                 break;
 
             i++;
@@ -93,11 +96,10 @@ struct Searching
 
         a[n - 1] = last;
 
-        if (i < n - 1 || last.price == key)
+        if (i < n - 1 || last.code == key)
         {
-            cout << "Sentinel Search: Found "
-                 << a[i].name
-                 << " at index " << i << endl;
+            cout << "Sentinel Search: Found | "
+                 << a[i].name << " | Rs." << a[i].price << endl;
         }
         else
         {
@@ -115,14 +117,13 @@ struct Searching
         {
             int mid = (low + high) / 2;
 
-            if (a[mid].price == key)
+            if (a[mid].code == key)
             {
-                cout << "Binary Search: Found "
-                     << a[mid].name
-                     << " at index " << mid << endl;
+                cout << "Binary Search: Found | "
+                     << a[mid].name << " | Rs." << a[mid].price << endl;
                 return;
             }
-            else if (a[mid].price < key)
+            else if (a[mid].code < key)
             {
                 low = mid + 1;
             }
@@ -155,14 +156,14 @@ struct Searching
         {
             int i = min(offset + fib2, n - 1);
 
-            if (a[i].price < key)
+            if (a[i].code < key)
             {
                 fib = fib1;
                 fib1 = fib2;
                 fib2 = fib - fib1;
                 offset = i;
             }
-            else if (a[i].price > key)
+            else if (a[i].code > key)
             {
                 fib = fib2;
                 fib1 = fib1 - fib2;
@@ -170,19 +171,18 @@ struct Searching
             }
             else
             {
-                cout << "Fibonacci Search: Found "
-                     << a[i].name
-                     << " at index " << i << endl;
+                cout << "Fibonacci Search: Found | "
+                     << a[i].name << " | Rs." << a[i].price << endl;
                 return;
             }
         }
 
         if (fib1 && offset + 1 < n &&
-            a[offset + 1].price == key)
+            a[offset + 1].code == key)
         {
-            cout << "Fibonacci Search: Found "
+            cout << "Fibonacci Search: Found | "
                  << a[offset + 1].name
-                 << " at index " << offset + 1 << endl;
+                 << " | Rs." << a[offset + 1].price << endl;
             return;
         }
 
@@ -195,13 +195,13 @@ struct Searching
         Item hashTable[100];
 
         for (int i = 0; i < 100; i++)
-            hashTable[i].price = -1;
+            hashTable[i].code = -1;
 
         for (int i = 0; i < n; i++)
         {
-            int index = a[i].price % 100;
+            int index = a[i].code % 100;
 
-            while (hashTable[index].price != -1)
+            while (hashTable[index].code != -1)
                 index = (index + 1) % 100;
 
             hashTable[index] = a[i];
@@ -209,13 +209,13 @@ struct Searching
 
         int index = key % 100;
 
-        while (hashTable[index].price != -1)
+        while (hashTable[index].code != -1)
         {
-            if (hashTable[index].price == key)
+            if (hashTable[index].code == key)
             {
-                cout << "Hashing: Found "
+                cout << "Hashing: Found | "
                      << hashTable[index].name
-                     << " at hash index " << index << endl;
+                     << " | Rs." << hashTable[index].price << endl;
                 return;
             }
 
@@ -237,7 +237,7 @@ int main()
 
     s.display();
 
-    cout << "\nEnter price to search: ";
+    cout << "\nEnter product code to search: ";
     cin >> key;
 
     cout << "\n--- Search Results ---\n";

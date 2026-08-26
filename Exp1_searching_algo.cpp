@@ -14,19 +14,21 @@ struct Searching
     int n;
 
     void input()
+{
+    cout << "Enter number of items: ";
+    cin >> n;
+
+    for (int i = 0; i < n; i++)
     {
-        cout << "Enter number of items: ";
-        cin >> n;
+        cin.ignore();
 
-        for (int i = 0; i < n; i++)
-        {
-            cout << "\nEnter item name: ";
-            cin >> a[i].name;
+        cout << "\nEnter item name: ";
+        getline(cin, a[i].name);
 
-            cout << "Enter price: ";
-            cin >> a[i].price;
-        }
+        cout << "Enter price: ";
+        cin >> a[i].price;
     }
+}
 
     void sortArray()
     {

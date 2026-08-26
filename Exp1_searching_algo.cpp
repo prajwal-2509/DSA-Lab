@@ -1,91 +1,89 @@
 #include <iostream>
-#include <algorithm>
+#include <string>
 using namespace std;
-class Searching
+
+struct Item
 {
-    int a[100];
+    string name;
+    int price;
+};
+
+struct Searching
+{
+    Item a[100];
     int n;
 
-public:
-
-    // Input
     void input()
     {
         cout << "Enter number of items: ";
         cin >> n;
 
-        cout << "Enter prices: ";
         for (int i = 0; i < n; i++)
-            cin >> a[i];
+        {
+            cout << "\nEnter item name: ";
+            cin >> a[i].name;
+
+            cout << "Enter price: ";
+            cin >> a[i].price;
+        }
     }
 
-    // Sort array
     void sortArray()
     {
         for (int i = 0; i < n - 1; i++)
         {
             for (int j = 0; j < n - i - 1; j++)
             {
-                if (a[j] > a[j + 1])
-                    swap(a[j], a[j + 1]);
+                if (a[j].price > a[j + 1].price)
+                {
+                    Item temp = a[j];
+                    a[j] = a[j + 1];
+                    a[j + 1] = temp;
+                }
             }
         }
     }
 
-    // Display array
     void display()
     {
-        cout << "Sorted prices: ";
-
-        for (int i = 0; i < n; i++)
-            cout << a[i] << " ";
-
-        cout << endl;
-    }
-
-    // 1. Linear Search
-    void linearSearch(int key)
-    {
-        int comparisons = 0;
-        int iterations = 0;
+        cout << "\nGrocery Items:\n";
 
         for (int i = 0; i < n; i++)
         {
-            iterations++;
-            comparisons++;
+            cout << i << ". "
+                 << a[i].name
+                 << " - Rs." << a[i].price << endl;
+        }
+    }
 
-            if (a[i] == key)
+    // Linear Search
+    void linearSearch(int key)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            if (a[i].price == key)
             {
-                cout << "Linear Search: Found"
-                     << " | Index: " << i
-                     << " | Comparisons: " << comparisons
-                     << " | Iterations: " << iterations << endl;
+                cout << "Linear Search: Found "
+                     << a[i].name
+                     << " at index " << i << endl;
                 return;
             }
         }
 
-        cout << "Linear Search: Not Found"
-             << " | Comparisons: " << comparisons
-             << " | Iterations: " << iterations << endl;
+        cout << "Linear Search: Not Found" << endl;
     }
 
-    // 2. Sentinel Search
+    // Sentinel Search
     void sentinelSearch(int key)
     {
-        int comparisons = 0;
-        int iterations = 0;
-
-        int last = a[n - 1];
-        a[n - 1] = key;
+        Item last = a[n - 1];
+        a[n - 1].price = key;
 
         int i = 0;
 
         while (true)
         {
-            iterations++;
-            comparisons++;
-
-            if (a[i] == key)
+            if (a[i].price == key)
                 break;
 
             i++;
@@ -93,140 +91,137 @@ public:
 
         a[n - 1] = last;
 
-        if (i < n - 1 || last == key)
+        if (i < n - 1 || last.price == key)
         {
-            cout << "Sentinel Search: Found"
-                 << " | Index: " << i
-                 << " | Comparisons: " << comparisons
-                 << " | Iterations: " << iterations << endl;
+            cout << "Sentinel Search: Found "
+                 << a[i].name
+                 << " at index " << i << endl;
         }
         else
         {
-            cout << "Sentinel Search: Not Found"
-                 << " | Comparisons: " << comparisons
-                 << " | Iterations: " << iterations << endl;
+            cout << "Sentinel Search: Not Found" << endl;
         }
     }
 
-    // 3. Binary Search
+    // Binary Search
     void binarySearch(int key)
     {
         int low = 0;
         int high = n - 1;
 
-        int comparisons = 0;
-        int iterations = 0;
-
         while (low <= high)
         {
-            iterations++;
-
             int mid = (low + high) / 2;
 
-            comparisons++;
-
-            if (a[mid] == key)
+            if (a[mid].price == key)
             {
-                cout << "Binary Search: Found"
-                     << " | Index: " << mid
-                     << " | Comparisons: " << comparisons
-                     << " | Iterations: " << iterations << endl;
+                cout << "Binary Search: Found "
+                     << a[mid].name
+                     << " at index " << mid << endl;
                 return;
             }
-            else if (a[mid] < key)
+            else if (a[mid].price < key)
             {
-                comparisons++;
                 low = mid + 1;
             }
             else
             {
-                comparisons++;
                 high = mid - 1;
             }
         }
 
-        cout << "Binary Search: Not Found"
-             << " | Comparisons: " << comparisons
-             << " | Iterations: " << iterations << endl;
+        cout << "Binary Search: Not Found" << endl;
     }
 
-    // 4. Fibonacci Search
-void fibonacciSearch(int key)
-{
-    int fib2 = 0;
-    int fib1 = 1;
-    int fib = fib1 + fib2;
-
-    int comparisons = 0;
-    int iterations = 0;
-
-    // Find the smallest Fibonacci number greater than or equal to n
-    while (fib < n)
+    // Fibonacci Search
+    void fibonacciSearch(int key)
     {
-        fib2 = fib1;
-        fib1 = fib;
-        fib = fib1 + fib2;
-    }
+        int fib2 = 0;
+        int fib1 = 1;
+        int fib = fib1 + fib2;
 
-    int offset = -1;
-
-    while (fib > 1)
-    {
-        iterations++;
-
-        int i = min(offset + fib2, n - 1);
-
-        comparisons++;
-
-        if (a[i] < key)
+        while (fib < n)
         {
-            comparisons++;
-
-            fib = fib1;
-            fib1 = fib2;
-            fib2 = fib - fib1;
-            offset = i;
+            fib2 = fib1;
+            fib1 = fib;
+            fib = fib1 + fib2;
         }
-        else if (a[i] > key)
-        {
-            comparisons++;
 
-            fib = fib2;
-            fib1 = fib1 - fib2;
-            fib2 = fib - fib1;
+        int offset = -1;
+
+        while (fib > 1)
+        {
+            int i = min(offset + fib2, n - 1);
+
+            if (a[i].price < key)
+            {
+                fib = fib1;
+                fib1 = fib2;
+                fib2 = fib - fib1;
+                offset = i;
+            }
+            else if (a[i].price > key)
+            {
+                fib = fib2;
+                fib1 = fib1 - fib2;
+                fib2 = fib - fib1;
+            }
+            else
+            {
+                cout << "Fibonacci Search: Found "
+                     << a[i].name
+                     << " at index " << i << endl;
+                return;
+            }
         }
-        else
-        {
-            cout << "Fibonacci Search: Found"
-                 << " | Index: " << i
-                 << " | Comparisons: " << comparisons
-                 << " | Iterations: " << iterations << endl;
 
+        if (fib1 && offset + 1 < n &&
+            a[offset + 1].price == key)
+        {
+            cout << "Fibonacci Search: Found "
+                 << a[offset + 1].name
+                 << " at index " << offset + 1 << endl;
             return;
         }
+
+        cout << "Fibonacci Search: Not Found" << endl;
     }
 
-    // Check the final possible element
-    if (fib1 && offset + 1 < n)
+    // Hashing
+    void hashing(int key)
     {
-        comparisons++;
-        iterations++;
+        Item hashTable[100];
 
-        if (a[offset + 1] == key)
+        for (int i = 0; i < 100; i++)
+            hashTable[i].price = -1;
+
+        for (int i = 0; i < n; i++)
         {
-            cout << "Fibonacci Search: Found"
-                 << " | Index: " << offset + 1
-                 << " | Comparisons: " << comparisons
-                 << " | Iterations: " << iterations << endl;
+            int index = a[i].price % 100;
 
-            return;
+            while (hashTable[index].price != -1)
+                index = (index + 1) % 100;
+
+            hashTable[index] = a[i];
         }
-    }
 
-    cout << "Fibonacci Search: Not Found"
-         << " | Comparisons: " << comparisons
-         << " | Iterations: " << iterations << endl;
-}
+        int index = key % 100;
+
+        while (hashTable[index].price != -1)
+        {
+            if (hashTable[index].price == key)
+            {
+                cout << "Hashing: Found "
+                     << hashTable[index].name
+                     << " at hash index " << index << endl;
+                return;
+            }
+
+            index = (index + 1) % 100;
+        }
+
+        cout << "Hashing: Not Found" << endl;
+    }
 };
 
 int main()
@@ -240,7 +235,7 @@ int main()
 
     s.display();
 
-    cout << "Enter price to search: ";
+    cout << "\nEnter price to search: ";
     cin >> key;
 
     cout << "\n--- Search Results ---\n";
@@ -249,6 +244,7 @@ int main()
     s.sentinelSearch(key);
     s.binarySearch(key);
     s.fibonacciSearch(key);
+    s.hashing(key);
 
     return 0;
 }

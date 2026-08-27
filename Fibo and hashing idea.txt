@@ -1,0 +1,767 @@
+Sure. This function implements a **hash table using open addressing with linear probing**. Its purpose is to **store all items in a hash table and then search for an item using its `key`**.
+
+Let's go through it step by step.
+
+### 1. Function declaration
+
+```cpp
+void hashing(int key)
+```
+
+* `hashing()` is a function.
+* `key` is the value we want to **search for**.
+* For example, if `key = 205`, the function tries to find the item whose `code` is `205`.
+
+---
+
+### 2. Create the hash table
+
+```cpp
+Item hashTable[100];
+```
+
+This creates an array of **100 `Item` objects**.
+
+So the valid positions are:
+
+```text
+0, 1, 2, ..., 99
+```
+
+Each `Item` apparently contains things like:
+
+```cpp
+code
+name
+price
+```
+
+---
+
+### 3. Mark every position as empty
+
+```cpp
+for (int i = 0; i < 100; i++)
+    hashTable[i].code = -1;
+```
+
+Here, `-1` is being used to mean **"this position is empty."**
+
+Initially:
+
+```text
+Index:       0    1    2    3    ...    99
+             ↓    ↓    ↓    ↓           ↓
+Code:       -1   -1   -1   -1    ...   -1
+```
+
+---
+
+## 4. Insert all items into the hash table
+
+```cpp
+for (int i = 0; i < n; i++)
+{
+    int index = a[i].code % 100;
+```
+
+For every item in array `a`, we calculate its hash index.
+
+The hash function is:
+
+```cpp
+a[i].code % 100
+```
+
+For example:
+
+```text
+code = 205
+
+205 % 100 = 5
+```
+
+So item `205` initially goes to index `5`.
+
+Another example:
+
+```text
+code = 312
+
+312 % 100 = 12
+```
+
+So item `312` initially goes to index `12`.
+
+---
+
+## 5. What if the position is already occupied?
+
+```cpp
+while (hashTable[index].code != -1)
+    index = (index + 1) % 100;
+```
+
+This is called **linear probing**.
+
+Suppose we have:
+
+```text
+code = 105
+105 % 100 = 5
+```
+
+So we try position `5`.
+
+But suppose position 5 already contains another item:
+
+```text
+Index:   4    5    6    7
+         ↓    ↓    ↓    ↓
+Code:   -1   205   -1   -1
+```
+
+Since position 5 is occupied, we move to:
+
+```cpp
+index = (index + 1) % 100;
+```
+
+So:
+
+```text
+5 → 6
+```
+
+If 6 is occupied too:
+
+```text
+6 → 7
+```
+
+And so on until an empty position is found.
+
+### Why `% 100`?
+
+It makes sure that we stay inside the array.
+
+For example:
+
+```text
+index = 99
+
+(99 + 1) % 100
+= 100 % 100
+= 0
+```
+
+So it wraps around:
+
+```text
+99 → 0 → 1 → 2 ...
+```
+
+---
+
+## 6. Store the item
+
+```cpp
+hashTable[index] = a[i];
+```
+
+Once an empty position is found, the entire `Item` is copied into that position.
+
+For example:
+
+```text
+a[i].code = 105
+
+Initial position = 5
+5 is occupied
+6 is empty
+
+Therefore:
+
+hashTable[6] = a[i]
+```
+
+The table might become:
+
+```text
+Index:    0    1    2    3    4    5    6
+Code:    -1   -1   -1   -1   -1   205  105
+```
+
+---
+
+# 7. Calculate the position for the key we're searching
+
+After inserting all items:
+
+```cpp
+int index = key % 100;
+```
+
+Suppose:
+
+```cpp
+key = 105
+```
+
+Then:
+
+```text
+105 % 100 = 5
+```
+
+So the search starts at index `5`.
+
+---
+
+# 8. Search using linear probing
+
+```cpp
+while (hashTable[index].code != -1)
+{
+```
+
+As long as the current position isn't empty, we continue searching.
+
+Inside the loop:
+
+```cpp
+if (hashTable[index].code == key)
+```
+
+We check whether the current item's code is the key we're looking for.
+
+If it is:
+
+```cpp
+cout << "Hashing: Found | "
+     << hashTable[index].name
+     << " | Rs." << hashTable[index].price << endl;
+return;
+```
+
+It prints the item's details and exits the function.
+
+For example:
+
+```text
+Hashing: Found | Laptop | Rs.55000
+```
+
+---
+
+## 9. If it isn't the key, move to the next position
+
+```cpp
+index = (index + 1) % 100;
+```
+
+Again, this is **linear probing**.
+
+For example, if we're looking for `105`:
+
+```text
+105 % 100 = 5
+
+Check index 5 → code is 205
+Not 105
+
+Move to index 6 → code is 105
+Found!
+```
+
+---
+
+# 10. If we reach an empty position
+
+If this condition becomes false:
+
+```cpp
+while (hashTable[index].code != -1)
+```
+
+it means we encountered an empty slot.
+
+Then:
+
+```cpp
+cout << "Hashing: Not Found" << endl;
+```
+
+is executed.
+
+Why can we conclude that it's not there?
+
+Because during insertion, items that collide are moved to the **next available position**. Therefore, while searching, encountering an empty slot means there couldn't be a matching item further along that probe sequence.
+
+---
+
+# Complete example
+
+Suppose we have:
+
+```text
+Items:
+
+code    name       price
+105     Laptop     55000
+205     Phone      20000
+305     Tablet     30000
+```
+
+### Insert 105
+
+```text
+105 % 100 = 5
+```
+
+Index 5 is empty:
+
+```text
+5 → 105
+```
+
+### Insert 205
+
+```text
+205 % 100 = 5
+```
+
+Index 5 is occupied.
+
+Move to 6:
+
+```text
+6 → 205
+```
+
+### Insert 305
+
+```text
+305 % 100 = 5
+```
+
+Index 5 occupied → try 6 → occupied → try 7.
+
+```text
+7 → 305
+```
+
+The table now looks like:
+
+```text
+Index:   0  1  2  3  4  5    6    7   8 ...
+                       ↓    ↓    ↓
+Code:   -1 -1 -1 -1 -1 105  205  305 -1 ...
+```
+
+Now suppose:
+
+```cpp
+hashing(205);
+```
+
+Search:
+
+```text
+205 % 100 = 5
+```
+
+Check:
+
+```text
+index 5 → 105 → not 205
+index 6 → 205 → FOUND!
+```
+
+Output:
+
+```text
+Hashing: Found | Phone | Rs.20000
+```
+
+---
+
+## In one sentence
+
+The program **creates a hash table of size 100, uses `code % 100` as the hash function, resolves collisions using linear probing, and searches for the requested `key` in the resulting table.**
+
+### Important terms to remember
+
+| Code                      | Meaning                         |
+| ------------------------- | ------------------------------- |
+| `code % 100`              | Hash function                   |
+| `-1`                      | Empty slot                      |
+| `(index + 1) % 100`       | Move to next slot / wrap around |
+| `while (...)`             | Linear probing                  |
+| `hashTable[index] = a[i]` | Insert item                     |
+| `code == key`             | Search successful               |
+| `Hashing: Not Found`      | Search unsuccessful             |
+
+One subtle point: this implementation assumes there are **not 100+ items** and doesn't explicitly detect a completely full table; with a full table, the insertion `while` loop could run forever.
+
+
+Sure. This is **Fibonacci Search**, which is a searching algorithm similar to Binary Search. The important difference is that instead of dividing the array in half, it uses **Fibonacci numbers** to decide where to check.
+
+### First, an important condition
+
+Your array `a` must be **sorted by `code` in ascending order**.
+
+For example:
+
+```text
+101  105  120  135  150  175  200
+```
+
+If the array isn't sorted, Fibonacci Search won't work correctly.
+
+---
+
+## 1. Start with Fibonacci numbers
+
+```cpp
+int fib2 = 0;
+int fib1 = 1;
+int fib = fib1 + fib2;
+```
+
+This creates the beginning of the Fibonacci sequence:
+
+```text
+fib2 = 0
+fib1 = 1
+fib  = 1
+```
+
+Fibonacci numbers are:
+
+```text
+0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ...
+```
+
+The algorithm needs a Fibonacci number that is **greater than or equal to `n`**, where `n` is the number of items.
+
+---
+
+## 2. Find a suitable Fibonacci number
+
+```cpp
+while (fib < n)
+{
+    fib2 = fib1;
+    fib1 = fib;
+    fib = fib1 + fib2;
+}
+```
+
+Suppose:
+
+```text
+n = 10
+```
+
+The loop generates:
+
+```text
+1 → 2 → 3 → 5 → 8 → 13
+```
+
+Since `13 >= 10`, it stops.
+
+So we have approximately:
+
+```text
+fib  = 13
+fib1 = 8
+fib2 = 5
+```
+
+---
+
+## 3. Set the offset
+
+```cpp
+int offset = -1;
+```
+
+`offset` tells us where the **already eliminated portion** of the array ends.
+
+Initially, nothing has been eliminated, so:
+
+```text
+offset = -1
+```
+
+---
+
+# 4. Main Fibonacci Search loop
+
+```cpp
+while (fib > 1)
+{
+```
+
+We continue searching while there is a useful Fibonacci range remaining.
+
+---
+
+## 5. Calculate the index to check
+
+```cpp
+int i = min(offset + fib2, n - 1);
+```
+
+This is the key part.
+
+Instead of doing:
+
+```cpp
+mid = (low + high) / 2;
+```
+
+like Binary Search, Fibonacci Search uses:
+
+```cpp
+offset + fib2
+```
+
+The `min()` ensures we don't go beyond the last array index:
+
+```cpp
+n - 1
+```
+
+For example, if:
+
+```text
+offset = -1
+fib2 = 5
+n = 10
+```
+
+then:
+
+```text
+i = min(-1 + 5, 9)
+  = min(4, 9)
+  = 4
+```
+
+So we check:
+
+```text
+a[4]
+```
+
+---
+
+# 6. If `a[i].code < key`
+
+```cpp
+if (a[i].code < key)
+{
+    fib = fib1;
+    fib1 = fib2;
+    fib2 = fib - fib1;
+    offset = i;
+}
+```
+
+This means:
+
+```text
+Current value < target
+```
+
+Since the array is sorted, the key must be **to the right**.
+
+For example:
+
+```text
+Index:  0   1   2   3   4   5   6
+Code:  10  20  30  40  50  60  70
+                          ↑
+                       checking 50
+
+key = 65
+```
+
+Since:
+
+```text
+50 < 65
+```
+
+we know everything up to index 4 can be ignored.
+
+So:
+
+```cpp
+offset = i;
+```
+
+becomes:
+
+```text
+offset = 4
+```
+
+The Fibonacci variables are then adjusted to search the remaining right-hand portion.
+
+---
+
+# 7. If `a[i].code > key`
+
+```cpp
+else if (a[i].code > key)
+{
+    fib = fib2;
+    fib1 = fib1 - fib2;
+    fib2 = fib - fib1;
+}
+```
+
+This means:
+
+```text
+Current value > target
+```
+
+Because the array is sorted, the key must be **to the left**.
+
+For example:
+
+```text
+Index:  0   1   2   3   4   5   6
+Code:  10  20  30  40  50  60  70
+                          ↑
+                       checking 50
+
+key = 35
+```
+
+Since:
+
+```text
+50 > 35
+```
+
+we search the left portion.
+
+Notice that `offset` is **not changed** here because the eliminated portion is on the right.
+
+---
+
+# 8. If the value equals the key
+
+```cpp
+else
+{
+    cout << "Fibonacci Search: Found | "
+         << a[i].name << " | Rs." << a[i].price << endl;
+    return;
+}
+```
+
+If:
+
+```cpp
+a[i].code == key
+```
+
+we found the item.
+
+For example:
+
+```text
+key = 50
+
+a[i].code = 50
+```
+
+Then it prints something like:
+
+```text
+Fibonacci Search: Found | Laptop | Rs.55000
+```
+
+and:
+
+```cpp
+return;
+```
+
+ends the function.
+
+---
+
+# 9. Final check
+
+After the main loop finishes:
+
+```cpp
+if (fib1 && offset + 1 < n &&
+    a[offset + 1].code == key)
+```
+
+there can be **one remaining element** that needs to be checked.
+
+That's why Fibonacci Search has this final check.
+
+It checks:
+
+```cpp
+a[offset + 1]
+```
+
+If that element contains the key, it prints the item.
+
+---
+
+# 10. Otherwise, not found
+
+If the key wasn't found anywhere:
+
+```cpp
+cout << "Fibonacci Search: Not Found" << endl;
+```
+
+---
+
+## Simple way to remember it
+
+Think of Fibonacci Search as:
+
+```text
+1. Array must be sorted
+        ↓
+2. Generate Fibonacci numbers
+        ↓
+3. Choose a Fibonacci number >= n
+        ↓
+4. Check a Fibonacci-based position
+        ↓
+5. If current < key → move RIGHT
+        ↓
+6. If current > key → move LEFT
+        ↓
+7. If current == key → FOUND
+        ↓
+8. Repeat
+```
+
+### Fibonacci Search vs Binary Search
+
+| Feature           | Binary Search | Fibonacci Search  |
+| ----------------- | ------------- | ----------------- |
+| Array sorted?     | Yes           | Yes               |
+| Splitting method  | Half          | Fibonacci numbers |
+| Example positions | Middle        | Fibonacci-based   |
+| Time complexity   | `O(log n)`    | `O(log n)`        |
+| Works on          | Sorted arrays | Sorted arrays     |
+
+**Most important thing for your exam:** Fibonacci Search **does not use `% 10` or `% 100`**. That's hashing. Fibonacci Search uses **Fibonacci numbers to calculate the search position**.

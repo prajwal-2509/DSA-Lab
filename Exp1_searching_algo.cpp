@@ -1,252 +1,286 @@
 #include <iostream>
-#include <string>
+#include <vector>
+#include <unordered_map>
 #include <algorithm>
 using namespace std;
 
-struct Item
+class Product
 {
+public:
     int code;
-    int price;
     string name;
+    double price;
+
+    Product(int c, string n, double p)
+    {
+        code = c;
+        name = n;
+        price = p;
+    }
 };
 
-struct Searching
+class GroceryStore
 {
-    Item a[100];
-    int n;
+    vector<Product> products;
+    unordered_map<int, Product> hashTable;
 
-    void input()
+public:
+    void inputProducts()
     {
-        cout << "Enter number of items: ";
+        int n;
+
+        cout << "Enter number of products: ";
         cin >> n;
 
         for (int i = 0; i < n; i++)
         {
+            int code;
+            string name;
+            double price;
+
             cout << "\nEnter product code: ";
-            cin >> a[i].code;
+            cin >> code;
 
             cout << "Enter product name: ";
-            cin.ignore();
-            getline(cin, a[i].name);
+            cin >> name;
 
-            cout << "Enter price: ";
-            cin >> a[i].price;
+            cout << "Enter product price: ";
+            cin >> price;
+
+            Product p(code, name, price);
+
+            products.push_back(p);
+            hashTable.insert({code, p});
         }
     }
 
-    void sortArray()
+    void displayBill()
     {
-        for (int i = 0; i < n - 1; i++)
+        double total = 0;
+
+        cout << "\nGROCERY BILL\n";
+        cout << "--------------------------------\n";
+        cout << "Code\tProduct\tPrice\n";
+        cout << "--------------------------------\n";
+
+        for (int i = 0; i < products.size(); i++)
         {
-            for (int j = 0; j < n - i - 1; j++)
-            {
-                if (a[j].code > a[j + 1].code)
-                {
-                    Item temp = a[j];
-                    a[j] = a[j + 1];
-                    a[j + 1] = temp;
-                }
-            }
+            cout << products[i].code << "\t"
+                 << products[i].name << "\t"
+                 << products[i].price << endl;
+
+            total += products[i].price;
         }
+
+        cout << "--------------------------------\n";
+        cout << "Grand Total: Rs. " << total << endl;
     }
 
-    void display()
+    int linearSearch(int key)
     {
-        cout << "\nGrocery Items:\n";
-
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < products.size(); i++)
         {
-            cout << "Code: " << a[i].code
-                 << " | Name: " << a[i].name
-                 << " | Price: Rs." << a[i].price << endl;
-        }
-    }
-
-    // Linear Search
-    void linearSearch(int key)
-    {
-        for (int i = 0; i < n; i++)
-        {
-            if (a[i].code == key)
-            {
-                cout << "Linear Search: Found | "
-                     << a[i].name << " | Rs." << a[i].price << endl;
-                return;
-            }
+            if (products[i].code == key)
+                return i;
         }
 
-        cout << "Linear Search: Not Found" << endl;
+        return -1;
     }
 
-    // Sentinel Search
-    void sentinelSearch(int key)
+    int sentinelSearch(int key)
     {
-        Item last = a[n - 1];
-        a[n - 1].code = key;
+        if (products.empty())
+            return -1;
+
+        int last = products.back().code;
+        products.back().code = key;
 
         int i = 0;
 
-        while (true)
-        {
-            if (a[i].code == key)
-                break;
-
+        while (products[i].code != key)
             i++;
-        }
 
-        a[n - 1] = last;
+        products.back().code = last;
 
-        if (i < n - 1 || last.code == key)
-        {
-            cout << "Sentinel Search: Found | "
-                 << a[i].name << " | Rs." << a[i].price << endl;
-        }
-        else
-        {
-            cout << "Sentinel Search: Not Found" << endl;
-        }
+        if (i == products.size() - 1 && last != key)
+            return -1;
+
+        return i;
     }
 
-    // Binary Search
-    void binarySearch(int key)
+    void sortProducts()
+    {
+        sort(products.begin(), products.end(),
+             [](Product a, Product b)
+             {
+                 return a.code < b.code;
+             });
+    }
+
+    int binarySearch(int key)
     {
         int low = 0;
-        int high = n - 1;
+        int high = products.size() - 1;
 
         while (low <= high)
         {
             int mid = (low + high) / 2;
 
-            if (a[mid].code == key)
-            {
-                cout << "Binary Search: Found | "
-                     << a[mid].name << " | Rs." << a[mid].price << endl;
-                return;
-            }
-            else if (a[mid].code < key)
-            {
+            if (products[mid].code == key)
+                return mid;
+
+            if (products[mid].code < key)
                 low = mid + 1;
-            }
             else
-            {
                 high = mid - 1;
-            }
         }
 
-        cout << "Binary Search: Not Found" << endl;
+        return -1;
     }
 
-    // Fibonacci Search
-    void fibonacciSearch(int key)
+    int fibonacciSearch(int key)
     {
-        int fib2 = 0;
-        int fib1 = 1;
-        int fib = fib1 + fib2;
+        int n = products.size();
 
-        while (fib < n)
-        {
-            fib2 = fib1;
-            fib1 = fib;
-            fib = fib1 + fib2;
-        }
-
+        int a = 0;
+        int b = 1;
+        int c = 1;
         int offset = -1;
 
-        while (fib > 1)
+        while (c < n)
         {
-            int i = min(offset + fib2, n - 1);
+            a = b;
+            b = c;
+            c = a + b;
+        }
 
-            if (a[i].code < key)
+        while (c > 1)
+        {
+            int i = min(offset + a, n - 1);
+
+            if (products[i].code < key)
             {
-                fib = fib1;
-                fib1 = fib2;
-                fib2 = fib - fib1;
+                c = b;
+                b = a;
+                a = c - b;
                 offset = i;
             }
-            else if (a[i].code > key)
+            else if (products[i].code > key)
             {
-                fib = fib2;
-                fib1 = fib1 - fib2;
-                fib2 = fib - fib1;
+                c = a;
+                b = b - a;
+                a = c - b;
             }
             else
             {
-                cout << "Fibonacci Search: Found | "
-                     << a[i].name << " | Rs." << a[i].price << endl;
-                return;
+                return i;
             }
         }
 
-        if (fib1 && offset + 1 < n &&
-            a[offset + 1].code == key)
+        if (b && offset + 1 < n &&
+            products[offset + 1].code == key)
+            return offset + 1;
+
+        return -1;
+    }
+
+    void result(string type, int i)
+    {
+        cout << "\n" << type << endl;
+
+        if (i == -1)
         {
-            cout << "Fibonacci Search: Found | "
-                 << a[offset + 1].name
-                 << " | Rs." << a[offset + 1].price << endl;
+            cout << "Product not found\n";
             return;
         }
 
-        cout << "Fibonacci Search: Not Found" << endl;
+        cout << "Product Code: " << products[i].code << endl;
+        cout << "Product: " << products[i].name << endl;
+        cout << "Price: Rs. " << products[i].price << endl;
     }
 
-    // Hashing
-    void hashing(int key)
+    void hashSearch(int key)
     {
-        Item hashTable[100];
+        auto x = hashTable.find(key);
 
-        for (int i = 0; i < 100; i++)
-            hashTable[i].code = -1;
+        cout << "\nHashing\n";
 
-        for (int i = 0; i < n; i++)
+        if (x == hashTable.end())
         {
-            int index = a[i].code % 100;
-
-            while (hashTable[index].code != -1)
-                index = (index + 1) % 100;
-
-            hashTable[index] = a[i];
+            cout << "Product not found\n";
+            return;
         }
 
-        int index = key % 100;
+        cout << "Product Code: " << x->second.code << endl;
+        cout << "Product: " << x->second.name << endl;
+        cout << "Price: Rs. " << x->second.price << endl;
+    }
 
-        while (hashTable[index].code != -1)
+    void searchProduct()
+    {
+        int choice;
+        int key;
+        int x = -1;
+
+        while (true)
         {
-            if (hashTable[index].code == key)
+            cout << "\n1. Linear Search";
+            cout << "\n2. Sentinel Search";
+            cout << "\n3. Binary Search";
+            cout << "\n4. Fibonacci Search";
+            cout << "\n5. Hashing";
+            cout << "\n6. Exit";
+            cout << "\nEnter choice: ";
+            cin >> choice;
+
+            if (choice == 6)
+                break;
+
+            cout << "\nEnter product code: ";
+            cin >> key;
+
+            if (choice == 1)
             {
-                cout << "Hashing: Found | "
-                     << hashTable[index].name
-                     << " | Rs." << hashTable[index].price << endl;
-                return;
+                x = linearSearch(key);
+                result("Linear Search", x);
             }
-
-            index = (index + 1) % 100;
+            else if (choice == 2)
+            {
+                x = sentinelSearch(key);
+                result("Sentinel Search", x);
+            }
+            else if (choice == 3)
+            {
+                sortProducts();
+                x = binarySearch(key);
+                result("Binary Search", x);
+            }
+            else if (choice == 4)
+            {
+                sortProducts();
+                x = fibonacciSearch(key);
+                result("Fibonacci Search", x);
+            }
+            else if (choice == 5)
+            {
+                hashSearch(key);
+            }
+            else
+            {
+                cout << "Invalid choice\n";
+            }
         }
-
-        cout << "Hashing: Not Found" << endl;
     }
 };
 
 int main()
 {
-    Searching s;
-    int key;
+    GroceryStore store;
 
-    s.input();
-
-    s.sortArray();
-
-    s.display();
-
-    cout << "\nEnter product code to search: ";
-    cin >> key;
-
-    cout << "\n--- Search Results ---\n";
-
-    s.linearSearch(key);
-    s.sentinelSearch(key);
-    s.binarySearch(key);
-    s.fibonacciSearch(key);
-    s.hashing(key);
+    store.inputProducts();
+    store.sortProducts();
+    store.displayBill();
+    store.searchProduct();
 
     return 0;
 }

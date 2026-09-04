@@ -1,0 +1,115 @@
+#include <iostream>
+using namespace std;
+
+struct product {
+    int id;
+    string name;
+    float price;
+    float rating;
+    string manufacturer;
+};
+
+void bubbleSortById(product a[], int n) {
+    product temp[n];
+
+    for (int i = 0; i < n; i++)
+        temp[i] = a[i];
+
+    for (int i = 0; i < n - 1; i++)
+        for (int j = 0; j < n - i - 1; j++)
+            if (temp[j].id > temp[j + 1].id)
+                swap(temp[j], temp[j + 1]);
+
+    cout << "\nIncreasing Order of ID:\n";
+    cout << "\nID\tName\tManufacturer\tPrice\tRating\n";
+
+    for (int i = 0; i < n; i++)
+        cout << temp[i].id << "\t" << temp[i].name << "\t"
+             << temp[i].manufacturer << "\t\t"
+             << temp[i].price << "\t" << temp[i].rating << "\n";
+}
+
+void selectionSortByPrice(product a[], int n) {
+    product temp[n];
+
+    for (int i = 0; i < n; i++)
+        temp[i] = a[i];
+
+    for (int i = 0; i < n - 1; i++) {
+        int min = i;
+
+        for (int j = i + 1; j < n; j++)
+            if (temp[j].price < temp[min].price)
+                min = j;
+
+        swap(temp[i], temp[min]);
+    }
+
+    cout << "\nIncreasing Order of Price:\n";
+    cout << "\nID\tName\tManufacturer\tPrice\tRating\n";
+
+    for (int i = 0; i < n; i++)
+        cout << temp[i].id << "\t" << temp[i].name << "\t"
+             << temp[i].manufacturer << "\t\t"
+             << temp[i].price << "\t" << temp[i].rating << "\n";
+}
+
+void insertionSortByRatingDesc(product a[], int n) {
+    product temp[n];
+
+    for (int i = 0; i < n; i++)
+        temp[i] = a[i];
+
+    for (int i = 1; i < n; i++) {
+        product key = temp[i];
+        int j = i - 1;
+
+        while (j >= 0 && temp[j].rating < key.rating) {
+            temp[j + 1] = temp[j];
+            j--;
+        }
+
+        temp[j + 1] = key;
+    }
+
+    cout << "\nDecreasing Order of Rating:\n";
+    cout << "\nID\tName\tManufacturer\tPrice\tRating\n";
+
+    for (int i = 0; i < n; i++)
+        cout << temp[i].id << "\t" << temp[i].name << "\t"
+             << temp[i].manufacturer << "\t\t"
+             << temp[i].price << "\t" << temp[i].rating << "\n";
+}
+
+int main() {
+    product a[100];
+    int k;
+
+    cout << "\nEnter No of Products: ";
+    cin >> k;
+
+    for (int i = 0; i < k; i++) {
+        cout << "\nEnter ID: ";
+        cin >> a[i].id;
+
+        cin.ignore();
+
+        cout << "Enter Name: ";
+        getline(cin, a[i].name);
+
+        cout << "Enter Manufacturer: ";
+        getline(cin, a[i].manufacturer);
+
+        cout << "Enter Price: ";
+        cin >> a[i].price;
+
+        cout << "Enter Rating: ";
+        cin >> a[i].rating;
+    }
+
+    bubbleSortById(a, k);
+    selectionSortByPrice(a, k);
+    insertionSortByRatingDesc(a, k);
+
+    return 0;
+}

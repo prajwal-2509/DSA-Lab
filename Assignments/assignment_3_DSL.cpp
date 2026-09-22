@@ -113,7 +113,51 @@ class Singlelinkedllist{
              delete temp;
     }
 
-        void sortByID() {
+    void sortByID() {
+    if (head == nullptr) return;
+
+    bool swapped = true;
+    while (swapped) {
+        swapped = false;
+        Node* temp = head;
+
+        while (temp != nullptr && temp->next != nullptr) {
+            if (temp->id > temp->next->id) {
+                swap(temp->id, temp->next->id);
+                swap(temp->name, temp->next->name);
+                swap(temp->duration, temp->next->duration);
+                swapped = true;
+            }
+            temp = temp->next;
+        }
+    }
+
+    cout << "\nPlaylist sorted by ID!\n";
+}
+
+        void sortByTitle() {
+    if (head == nullptr) return;
+
+    bool swapped = true;
+    while (swapped) {
+        swapped = false;
+        Node* temp = head;
+
+        while (temp != nullptr && temp->next != nullptr) {
+            if (temp->name > temp->next->name) {
+                swap(temp->id, temp->next->id);
+                swap(temp->name, temp->next->name);
+                swap(temp->duration, temp->next->duration);
+                swapped = true;
+            }
+            temp = temp->next;
+        }
+    }
+
+    cout << "\nPlaylist sorted by Title!\n";
+}
+
+    void sortByDuration() {
         if (head == nullptr) return;
 
         bool swapped = true;
@@ -122,7 +166,7 @@ class Singlelinkedllist{
             Node* temp = head;
 
             while (temp != nullptr && temp->next != nullptr) {
-                if (temp->id > temp->next->id) {
+                if (temp->duration > temp->next->duration) {
                     swap(temp->id, temp->next->id);
                     swap(temp->name, temp->next->name);
                     swap(temp->duration, temp->next->duration);
@@ -131,7 +175,8 @@ class Singlelinkedllist{
                 temp = temp->next;
             }
         }
-        cout << "\nPlaylist sorted by ID!\n";
+
+        cout << "\nPlaylist sorted by Duration!\n";
     }
     
     void playLoop() {
@@ -172,8 +217,10 @@ int main(){
         cout << "2. Display Playlist\n";
         cout << "3. Delete Song\n";
         cout << "4. Sort by ID\n";
-        cout << "5. Play Playlist in Loop\n";
-        cout << "6. Exit\n";
+        cout << "5. Sort by Title\n";
+        cout << "6. Sort by Duration\n";
+        cout << "7. Play Playlist in Loop\n";
+        cout << "8. Exit\n";
         cout << "Enter choice: ";
         cin >> choice;
 
@@ -194,9 +241,15 @@ int main(){
             s.sortByID();
         }
         else if(choice == 5){
-            s.playLoop();
+            s.sortByTitle();
         }
         else if(choice == 6){
+            s.sortByDuration();
+        }
+        else if(choice == 7){
+            s.playLoop();
+        }
+        else if(choice == 8){
             break;
         }
         else{

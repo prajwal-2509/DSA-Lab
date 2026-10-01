@@ -87,12 +87,23 @@ public:
         return i;
     }
 
+    // void sortProducts() {
+    //     sort(products.begin(), products.end(),
+    //         [](Product a, Product b) {
+    //             return a.name < b.name;
+    //         });
+    // }
     void sortProducts() {
-        sort(products.begin(), products.end(),
-            [](Product a, Product b) {
-                return a.name < b.name;
-            });
+    for(int i = 0; i < products.size() - 1; i++) {
+        for(int j = i + 1; j < products.size(); j++) {
+            if(products[i].name > products[j].name) {
+                Product temp = products[i];
+                products[i] = products[j];
+                products[j] = temp;
+            }
+        }
     }
+}
 
     int binarySearch(string key) {
         int low = 0;

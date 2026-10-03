@@ -1,6 +1,6 @@
 #include<iostream>
-// #include<algorithm>
-// #include<string>
+#include<algorithm>
+#include<string>
 using namespace std;
 
 class Product{
@@ -14,7 +14,7 @@ class Product{
 
 class Sorting{
     public:
-
+        int pass=0;
         void display(Product a[], int n){
             cout<<"ID\tName\tManufacturer\tPrice\tRating\n";
 
@@ -41,6 +41,8 @@ class Sorting{
                         swap(temp[j],temp[j+1]);
                     }
                 }
+                cout<<"\nPass "<<i+1<<":\n";
+                display(temp,n);
             }
 
             cout<<"\nSorted by Product ID (Increasing):\n";
@@ -65,6 +67,8 @@ class Sorting{
                 }
 
                 swap(temp[i],temp[smallest]);
+                cout<<"\nPass "<<i+1<<":\n";
+                display(temp,n);
             }
 
             cout<<"\nSorted by Price (Increasing):\n";
@@ -89,6 +93,8 @@ class Sorting{
                 }
 
                 temp[j+1]=key;
+                cout<<"\nPass "<<i<<":\n";
+                display(temp,n);
             }
 
             cout<<"\nSorted by Quality Rating (Decreasing):\n";
@@ -114,6 +120,11 @@ class Sorting{
             }
 
             quickswap(&a[i+1],&a[high]);
+
+            pass++;
+
+            cout<<"\nPass "<<pass<<" (Pivot = "<<pivot<<"):\n";
+            display(a,high+1);
 
             return i+1;
         }
@@ -163,6 +174,8 @@ class Sorting{
             for(i=low;i<=high;i++){
                 A[i]=temp[i];
             }
+                cout<<"\nMerge Pass ("<<low<<" to "<<high<<"):\n";
+                display(A,high+1);
         }
 
         // Merge Sort - Increasing Product Name
@@ -223,6 +236,7 @@ int main(){
     s.insertionSort(a,n);
 
     cout<<"\nUsing Quick Sort";
+    s.pass=0;
     s.quickSort(a_quick,0,n-1);
     cout<<"\nSorted by Quality Rating (Decreasing):\n";
     s.display(a_quick,n);

@@ -213,15 +213,15 @@ int main(){
     int choice, pos, id;
 
     while(true){
-        cout << "\n1. Insert Song\n";
-        cout << "2. Display Playlist\n";
-        cout << "3. Delete Song\n";
-        cout << "4. Sort by ID\n";
-        cout << "5. Sort by Title\n";
-        cout << "6. Sort by Duration\n";
-        cout << "7. Play Playlist in Loop\n";
-        cout << "8. Exit\n";
-        cout << "Enter choice: ";
+        cout << "\n1. Insert Song\n"
+        << "2. Display Playlist\n"
+        << "3. Delete Song\n"
+        << "4. Sort by ID\n"
+        << "5. Sort by Title\n"
+        << "6. Sort by Duration\n"
+        << "7. Play Playlist in Loop\n"
+        << "8. Exit\n"
+        << "Enter choice: ";
         cin >> choice;
 
         if(choice == 1){

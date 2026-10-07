@@ -625,6 +625,10 @@ int main()
                 break;
 
             case 7:
+                list.playLoop();
+                break;
+
+            case 8:
                 cout << "\nExiting Playlist...";
                 break;
 
@@ -632,7 +636,7 @@ int main()
                 cout << "\nInvalid choice!";
         }
 
-    } while (choice != 7);
+    } while (choice != 8);
 
     return 0;
 }

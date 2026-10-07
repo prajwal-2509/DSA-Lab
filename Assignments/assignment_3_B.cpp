@@ -1,11 +1,17 @@
 #include <iostream>
 using namespace std;
 
-struct Node
+class Node
 {
+public:
     int prn;
     string name;
     Node *next;
+
+    Node()
+    {
+        next = NULL;
+    }
 };
 
 class Club
@@ -26,10 +32,12 @@ public:
 
         cout << "Enter PRN: ";
         cin >> prn;
+
         cout << "Enter Name: ";
         cin >> name;
 
         Node *newNode = new Node;
+
         newNode->prn = prn;
         newNode->name = name;
         newNode->next = NULL;
@@ -144,6 +152,7 @@ public:
 int main()
 {
     Club division1, division2;
+
     int choice, division;
 
     do
@@ -155,6 +164,7 @@ int main()
         cout << "4. Total Members\n";
         cout << "5. Concatenate Two Divisions\n";
         cout << "6. Exit\n";
+
         cout << "Enter choice: ";
         cin >> choice;
 
@@ -168,6 +178,7 @@ int main()
                 division1.addMember();
             else
                 division2.addMember();
+
             break;
 
         case 2:
@@ -176,6 +187,7 @@ int main()
 
             cout << "\nDivision 2:\n";
             division2.showMembers();
+
             break;
 
         case 3:
@@ -186,6 +198,7 @@ int main()
                 division1.deleteMember();
             else
                 division2.deleteMember();
+
             break;
 
         case 4:
@@ -194,6 +207,7 @@ int main()
 
             cout << "Division 2 Members: "
                  << division2.totalMembers() << endl;
+
             break;
 
         case 5:
@@ -201,6 +215,7 @@ int main()
 
             cout << "\nAfter Concatenation:\n";
             division1.showMembers();
+
             break;
 
         case 6:

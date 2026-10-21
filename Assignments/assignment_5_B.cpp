@@ -1,186 +1,150 @@
-/*C++ Program
-A Deque (Double-Ended Queue) is the appropriate data structure because orders can be added and deleted from both the front and rear ends.
-*/
-
 
 #include <iostream>
 using namespace std;
 
-class Deque
-{
+class Deque {
     int a[100];
-    int front, rear;
+    int front, rear, count;
 
 public:
-    Deque()
-    {
-        front = -1;
+    Deque() {
+        front = 0;
         rear = -1;
+        count = 0;
     }
 
-    bool isEmpty()
-    {
-        return front == -1;
+    bool isEmpty() {
+        return count == 0;
     }
 
-    bool isFull()
-    {
-        return (front == 0 && rear == 99) ||
-               (front == rear + 1);
+    bool isFull() {
+        return count == 100;
     }
 
-    void insertFront(int order)
-    {
-        if (isFull())
-        {
-            cout << "Queue is full.\n";
+    void insertFront(int order) {
+        if (isFull()) {
+            cout << "Deque is full\n";
             return;
         }
 
         if (isEmpty())
             front = rear = 0;
-        else if (front == 0)
-            front = 99;
         else
-            front--;
+            front = (front - 1 + 100) % 100;
 
         a[front] = order;
-        cout << "Order added at front.\n";
+        count++;
+        cout << "Order inserted at front\n";
     }
 
-    void insertRear(int order)
-    {
-        if (isFull())
-        {
-            cout << "Queue is full.\n";
+    void insertRear(int order) {
+        if (isFull()) {
+            cout << "Deque is full\n";
             return;
         }
 
         if (isEmpty())
             front = rear = 0;
-        else if (rear == 99)
-            rear = 0;
         else
-            rear++;
+            rear = (rear + 1) % 100;
 
         a[rear] = order;
-        cout << "Order added at rear.\n";
+        count++;
+        cout << "Order inserted at rear\n";
     }
 
-    void deleteFront()
-    {
-        if (isEmpty())
-        {
-            cout << "Queue is empty.\n";
+    void deleteFront() {
+        if (isEmpty()) {
+            cout << "Deque is empty\n";
             return;
         }
 
-        cout << "Processed order: " << a[front] << endl;
+        cout << "Order processed: " << a[front] << endl;
+        front = (front + 1) % 100;
+        count--;
 
-        if (front == rear)
-            front = rear = -1;
-        else if (front == 99)
+        if (isEmpty()) {
             front = 0;
-        else
-            front++;
+            rear = -1;
+        }
     }
 
-    void deleteRear()
-    {
-        if (isEmpty())
-        {
-            cout << "Queue is empty.\n";
+    void deleteRear() {
+        if (isEmpty()) {
+            cout << "Deque is empty\n";
             return;
         }
 
-        cout << "Removed order: " << a[rear] << endl;
+        cout << "Order processed: " << a[rear] << endl;
+        rear = (rear - 1 + 100) % 100;
+        count--;
 
-        if (front == rear)
-            front = rear = -1;
-        else if (rear == 0)
-            rear = 99;
-        else
-            rear--;
+        if (isEmpty()) {
+            front = 0;
+            rear = -1;
+        }
     }
 
-    void display()
-    {
-        if (isEmpty())
-        {
-            cout << "No orders in queue.\n";
+    void display() {
+        if (isEmpty()) {
+            cout << "Deque is empty\n";
             return;
         }
 
         cout << "Orders: ";
-        int i = front;
-
-        while (true)
-        {
-            cout << a[i] << " ";
-
-            if (i == rear)
-                break;
-
-            i = (i + 1) % 100;
-        }
-
+        for (int i = 0; i < count; i++)
+            cout << a[(front + i) % 100] << " ";
         cout << endl;
     }
 };
 
-int main()
-{
-    Deque q;
+int main() {
+    Deque d;
     int choice, order;
 
-    do
-    {
-        cout << "\n--- Pizza Parlour ---\n";
-        cout << "1. Add Order at Front\n";
-        cout << "2. Add Order at Rear\n";
-        cout << "3. Process Order from Front\n";
-        cout << "4. Remove Order from Rear\n";
-        cout << "5. Display Orders\n";
-        cout << "6. Exit\n";
-        cout << "Enter choice: ";
+    do {
+        cout << "\n1. Insert at Front";
+        cout << "\n2. Insert at Rear";
+        cout << "\n3. Delete from Front";
+        cout << "\n4. Delete from Rear";
+        cout << "\n5. Display Orders";
+        cout << "\n6. Exit";
+        cout << "\nEnter choice: ";
         cin >> choice;
 
-        switch (choice)
-        {
-        case 1:
-            cout << "Enter order ID: ";
-            cin >> order;
-            q.insertFront(order);
-            break;
+        switch (choice) {
+            case 1:
+                cout << "Enter order number: ";
+                cin >> order;
+                d.insertFront(order);
+                break;
 
-        case 2:
-            cout << "Enter order ID: ";
-            cin >> order;
-            q.insertRear(order);
-            break;
+            case 2:
+                cout << "Enter order number: ";
+                cin >> order;
+                d.insertRear(order);
+                break;
 
-        case 3:
-            q.deleteFront();
-            break;
+            case 3:
+                d.deleteFront();
+                break;
 
-        case 4:
-            q.deleteRear();
-            break;
+            case 4:
+                d.deleteRear();
+                break;
 
-        case 5:
-            q.display();
-            break;
+            case 5:
+                d.display();
+                break;
 
-        case 6:
-            cout << "Exiting...\n";
-            break;
+            case 6:
+                cout << "Exiting...\n";
+                break;
 
-        default:
-            cout << "Invalid choice.\n";
+            default:
+                cout << "Invalid choice\n";
         }
-
     } while (choice != 6);
 
     return 0;
 }
-

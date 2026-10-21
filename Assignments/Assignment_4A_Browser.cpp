@@ -1,227 +1,263 @@
+
+/*
+A browser maintains a history, which refers to a list of recently visited websites or web pages in
+a data structure. Write a C++ menu-driven program to store the browser history or navigation
+information dynamically as page_id and recent time-stamp. Write functions to
+1. Visit a specific web page.
+2. Navigate forward and backward.
+3. Add new web pages.
+4. Deleting web pages from existing lists.
+*/
+
 #include <iostream>
 #include <string>
+#include <ctime>
 using namespace std;
 
-class Node
+struct Page
 {
-public:
     int page_id;
     string timestamp;
-    Node *prev;
-    Node *next;
-
-    Node(int id, string time)
-    {
-        page_id = id;
-        timestamp = time;
-        prev = NULL;
-        next = NULL;
-    }
+    Page* next;
+    Page* prev;
 };
 
-class Browser
+class BrowserHistory
 {
-private:
-    Node *head;
-    Node *current;
+    Page* head;
+    Page* current;
+    Page* tail;
+
+    string getTime()
+    {
+        time_t now = time(0);
+        string t = ctime(&now);
+        if (!t.empty() && t.back() == '\n')
+            t.pop_back();
+        return t;
+    }
 
 public:
-    Browser()
+    BrowserHistory()
     {
-        head = NULL;
-        current = NULL;
+        head = current = tail = nullptr;
     }
 
-    ~Browser()
+    void addPage(int id)
     {
-        Node *temp = head;
+        Page* newPage = new Page;
+        newPage->page_id = id;
+        newPage->timestamp = getTime();
+        newPage->next = nullptr;
+        newPage->prev = nullptr;
 
-        while (temp != NULL)
+        if (head == nullptr)
         {
-            Node *next = temp->next;
-            delete temp;
-            temp = next;
-        }
-    }
-
-    void visitPage()
-    {
-        int id;
-        string time;
-
-        cout << "Enter Page ID: ";
-        cin >> id;
-
-        cout << "Enter Time Stamp: ";
-        cin >> time;
-
-        Node *newNode = new Node(id, time);
-
-        if (head == NULL)
-        {
-            head = newNode;
-            current = newNode;
+            head = current = tail = newPage;
         }
         else
         {
-            current->next = newNode;
-            newNode->prev = current;
-            current = newNode;
+            if (current != tail)
+            {
+                Page* temp = current->next;
+                while (temp != nullptr)
+                {
+                    Page* del = temp;
+                    temp = temp->next;
+                    delete del;
+                }
+                current->next = nullptr;
+                tail = current;
+            }
+
+            tail->next = newPage;
+            newPage->prev = tail;
+            tail = newPage;
+            current = newPage;
         }
 
-        cout << "Page visited.\n";
+        cout << "Web page added successfully.\n";
     }
 
-    void backward()
+    void visitPage(int id)
     {
-        if (current == NULL || current->prev == NULL)
-            cout << "No previous page.\n";
-        else
+        Page* temp = head;
+
+        while (temp != nullptr)
+        {
+            if (temp->page_id == id)
+            {
+                current = temp;
+                current->timestamp = getTime();
+                cout << "Visited page ID: " << current->page_id << "\n";
+                return;
+            }
+            temp = temp->next;
+        }
+
+        cout << "Page not found in history.\n";
+    }
+
+    void goBackward()
+    {
+        if (current != nullptr && current->prev != nullptr)
         {
             current = current->prev;
-            cout << "Page ID: " << current->page_id << endl;
-            cout << "Time: " << current->timestamp << endl;
+            current->timestamp = getTime();
+            cout << "Moved backward to page ID: "
+                 << current->page_id << "\n";
+        }
+        else
+        {
+            cout << "No previous page available.\n";
         }
     }
 
-    void forward()
+    void goForward()
     {
-        if (current == NULL || current->next == NULL)
-            cout << "No next page.\n";
-        else
+        if (current != nullptr && current->next != nullptr)
         {
             current = current->next;
-            cout << "Page ID: " << current->page_id << endl;
-            cout << "Time: " << current->timestamp << endl;
-        }
-    }
-
-    void addPage()
-    {
-        int id;
-        string time;
-
-        cout << "Enter Page ID: ";
-        cin >> id;
-
-        cout << "Enter Time Stamp: ";
-        cin >> time;
-
-        Node *newNode = new Node(id, time);
-
-        if (head == NULL)
-        {
-            head = newNode;
-            current = newNode;
+            current->timestamp = getTime();
+            cout << "Moved forward to page ID: "
+                 << current->page_id << "\n";
         }
         else
         {
-            Node *temp = head;
-
-            while (temp->next != NULL)
-                temp = temp->next;
-
-            temp->next = newNode;
-            newNode->prev = temp;
-            current = newNode;
+            cout << "No next page available.\n";
         }
-
-        cout << "Page added.\n";
     }
 
-    void deletePage()
+    void deletePage(int id)
     {
-        int id;
+        Page* temp = head;
 
-        cout << "Enter Page ID to delete: ";
-        cin >> id;
-
-        Node *temp = head;
-
-        while (temp != NULL && temp->page_id != id)
+        while (temp != nullptr && temp->page_id != id)
             temp = temp->next;
 
-        if (temp == NULL)
+        if (temp == nullptr)
         {
             cout << "Page not found.\n";
             return;
         }
 
-        if (temp->prev != NULL)
+        if (temp->prev != nullptr)
             temp->prev->next = temp->next;
         else
             head = temp->next;
 
-        if (temp->next != NULL)
+        if (temp->next != nullptr)
             temp->next->prev = temp->prev;
+        else
+            tail = temp->prev;
 
         if (current == temp)
         {
-            if (temp->next != NULL)
-                current = temp->next;
-            else
-                current = temp->prev;
+            current = temp->next != nullptr ? temp->next : temp->prev;
         }
 
         delete temp;
 
-        cout << "Page deleted.\n";
+        cout << "Web page deleted successfully.\n";
     }
 
-    void menu()
+    void displayHistory()
     {
-        int choice;
-
-        do
+        if (head == nullptr)
         {
-            cout << "\n===== Browser History =====";
-            cout << "\n1. Visit Page";
-            cout << "\n2. Backward";
-            cout << "\n3. Forward";
-            cout << "\n4. Add Page";
-            cout << "\n5. Delete Page";
-            cout << "\n6. Exit";
-            cout << "\nEnter choice: ";
-            cin >> choice;
+            cout << "Browser history is empty.\n";
+            return;
+        }
 
-            switch (choice)
-            {
-            case 1:
-                visitPage();
-                break;
+        Page* temp = head;
 
-            case 2:
-                backward();
-                break;
+        cout << "\nBrowser History:\n";
 
-            case 3:
-                forward();
-                break;
+        while (temp != nullptr)
+        {
+            cout << "Page ID: " << temp->page_id
+                 << " | Timestamp: " << temp->timestamp;
 
-            case 4:
-                addPage();
-                break;
+            if (temp == current)
+                cout << " [Current Page]";
 
-            case 5:
-                deletePage();
-                break;
+            cout << "\n";
+            temp = temp->next;
+        }
+    }
 
-            case 6:
-                cout << "Exit";
-                break;
+    ~BrowserHistory()
+    {
+        Page* temp = head;
 
-            default:
-                cout << "Invalid choice";
-            }
-
-        } while (choice != 6);
+        while (temp != nullptr)
+        {
+            Page* del = temp;
+            temp = temp->next;
+            delete del;
+        }
     }
 };
 
 int main()
 {
-    Browser browser;
-    browser.menu();
+    BrowserHistory browser;
+    int choice, id;
+
+    do
+    {
+        cout << "\n--- Browser History Menu ---\n";
+        cout << "1. Visit a specific web page\n";
+        cout << "2. Navigate backward\n";
+        cout << "3. Navigate forward\n";
+        cout << "4. Add a new web page\n";
+        cout << "5. Delete a web page\n";
+        cout << "6. Display browser history\n";
+        cout << "0. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            cout << "Enter page ID to visit: ";
+            cin >> id;
+            browser.visitPage(id);
+            break;
+
+        case 2:
+            browser.goBackward();
+            break;
+
+        case 3:
+            browser.goForward();
+            break;
+
+        case 4:
+            cout << "Enter new page ID: ";
+            cin >> id;
+            browser.addPage(id);
+            break;
+
+        case 5:
+            cout << "Enter page ID to delete: ";
+            cin >> id;
+            browser.deletePage(id);
+            break;
+
+        case 6:
+            browser.displayHistory();
+            break;
+
+        case 0:
+            cout << "Exiting browser history.\n";
+            break;
+
+        default:
+            cout << "Invalid choice. Try again.\n";
+        }
+
+    } while (choice != 0);
 
     return 0;
 }

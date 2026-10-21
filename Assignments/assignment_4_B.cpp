@@ -1,55 +1,66 @@
+
+/*
+The ticket booking system of the theater has to be implemented using C++ program. There are
+M rows and N seats in each row. Keep track of free seats at rows. Assume some random booking
+to start with. Use an array to store pointers (Head pointer) to each row. On demand:
+1. The list of available seats is to be displayed.
+2. The seats are to be booked.
+3. The booking can be cancelled.
+
+Note: Use Doubly Linked List to store data.
+*/
+
 #include <iostream>
 using namespace std;
 
-struct Node
+struct Seat
 {
-    int seat;
-    Node *prev;
-    Node *next;
+    int seatNo;
+    bool booked;
+    Seat* next;
+    Seat* prev;
 };
 
 class Theater
 {
-    Node **head;
     int M, N;
+    Seat** head;
 
 public:
-
     Theater(int rows, int seats)
     {
         M = rows;
         N = seats;
 
-        head = new Node*[M];
-
-        for (int i = 0; i < M; i++)
-            head[i] = NULL;
+        head = new Seat*[M];
 
         for (int i = 0; i < M; i++)
         {
+            head[i] = nullptr;
+            Seat* last = nullptr;
+
             for (int j = 1; j <= N; j++)
             {
-                Node *newNode = new Node;
-                newNode->seat = j;
-                newNode->prev = NULL;
-                newNode->next = NULL;
+                Seat* newSeat = new Seat;
+                newSeat->seatNo = j;
+                newSeat->booked = false;
+                newSeat->next = nullptr;
+                newSeat->prev = last;
 
-                if (head[i] == NULL)
-                {
-                    head[i] = newNode;
-                }
+                if (head[i] == nullptr)
+                    head[i] = newSeat;
                 else
-                {
-                    Node *temp = head[i];
+                    last->next = newSeat;
 
-                    while (temp->next != NULL)
-                        temp = temp->next;
-
-                    temp->next = newNode;
-                    newNode->prev = temp;
-                }
+                last = newSeat;
             }
         }
+
+        head[0]->booked = true;
+        if (N >= 3)
+            head[0]->next->next->booked = true;
+        if (M >= 2)
+            head[1]->next->booked = true;
     }
 
     void displayAvailableSeats()
@@ -60,149 +71,137 @@ public:
         {
             cout << "Row " << i + 1 << ": ";
 
-            Node *temp = head[i];
+            Seat* temp = head[i];
+            bool found = false;
 
-            if (temp == NULL)
+            while (temp != nullptr)
             {
-                cout << "No seats available";
-            }
-            else
-            {
-                while (temp != NULL)
+                if (!temp->booked)
                 {
-                    cout << temp->seat << " ";
-                    temp = temp->next;
+                    cout << temp->seatNo << " ";
+                    found = true;
                 }
+                temp = temp->next;
             }
 
-            cout << endl;
+            if (!found)
+                cout << "No seats available";
+
+            cout << "\n";
         }
     }
 
-    void bookSeat()
+    void bookSeat(int row, int seatNo)
     {
-        int row, seat;
-
-        cout << "Enter Row: ";
-        cin >> row;
-
-        cout << "Enter Seat: ";
-        cin >> seat;
-
-        if (row < 1 || row > M || seat < 1 || seat > N)
+        if (row < 1 || row > M ||
+            seatNo < 1 || seatNo > N)
         {
-            cout << "Invalid row or seat.\n";
+            cout << "Invalid row or seat number.\n";
             return;
         }
 
-        Node *temp = head[row - 1];
+        Seat* temp = head[row - 1];
 
-        while (temp != NULL && temp->seat != seat)
+        while (temp != nullptr && temp->seatNo != seatNo)
             temp = temp->next;
 
-        if (temp == NULL)
-        {
+        if (temp->booked)
             cout << "Seat is already booked.\n";
-            return;
-        }
-
-        if (temp->prev != NULL)
-            temp->prev->next = temp->next;
         else
-            head[row - 1] = temp->next;
-
-        if (temp->next != NULL)
-            temp->next->prev = temp->prev;
-
-        delete temp;
-
-        cout << "Seat booked successfully.\n";
+        {
+            temp->booked = true;
+            cout << "Seat booked successfully.\n";
+        }
     }
 
-    void cancelBooking()
+    void cancelBooking(int row, int seatNo)
     {
-        int row, seat;
-
-        cout << "Enter Row: ";
-        cin >> row;
-
-        cout << "Enter Seat: ";
-        cin >> seat;
-
-        if (row < 1 || row > M || seat < 1 || seat > N)
+        if (row < 1 || row > M ||
+            seatNo < 1 || seatNo > N)
         {
-            cout << "Invalid row or seat.\n";
+            cout << "Invalid row or seat number.\n";
             return;
         }
 
-        Node *newNode = new Node;
-        newNode->seat = seat;
-        newNode->prev = NULL;
-        newNode->next = NULL;
+        Seat* temp = head[row - 1];
 
-        if (head[row - 1] == NULL)
-        {
-            head[row - 1] = newNode;
-        }
+        while (temp != nullptr && temp->seatNo != seatNo)
+            temp = temp->next;
+
+        if (!temp->booked)
+            cout << "Seat is not booked.\n";
         else
         {
-            Node *temp = head[row - 1];
+            temp->booked = false;
+            cout << "Booking cancelled successfully.\n";
+        }
+    }
 
-            if (seat < temp->seat)
+    void displayAllSeats()
+    {
+        cout << "\nSeat Status (B = Booked, F = Free):\n";
+
+        for (int i = 0; i < M; i++)
+        {
+            cout << "Row " << i + 1 << ": ";
+
+            Seat* temp = head[i];
+
+            while (temp != nullptr)
             {
-                newNode->next = temp;
-                temp->prev = newNode;
-                head[row - 1] = newNode;
+                cout << temp->seatNo << "-"
+                     << (temp->booked ? "B " : "F ");
+                temp = temp->next;
             }
-            else
+
+            cout << "\n";
+        }
+    }
+
+    ~Theater()
+    {
+        for (int i = 0; i < M; i++)
+        {
+            Seat* temp = head[i];
+
+            while (temp != nullptr)
             {
-                while (temp->next != NULL && temp->next->seat < seat)
-                    temp = temp->next;
-
-                if (temp->seat == seat ||
-                    (temp->next != NULL && temp->next->seat == seat))
-                {
-                    cout << "Seat is already available.\n";
-                    delete newNode;
-                    return;
-                }
-
-                newNode->next = temp->next;
-                newNode->prev = temp;
-
-                if (temp->next != NULL)
-                    temp->next->prev = newNode;
-
-                temp->next = newNode;
+                Seat* del = temp;
+                temp = temp->next;
+                delete del;
             }
         }
 
-        cout << "Booking cancelled successfully.\n";
+        delete[] head;
     }
 };
 
 int main()
 {
-    int M, N, choice;
+    int M, N, choice, row, seatNo;
 
     cout << "Enter number of rows: ";
     cin >> M;
 
-    cout << "Enter seats in each row: ";
+    cout << "Enter seats per row: ";
     cin >> N;
+
+    if (M <= 0 || N <= 0)
+    {
+        cout << "Invalid theater dimensions.\n";
+        return 0;
+    }
 
     Theater t(M, N);
 
-    t.bookSeat();
-    t.bookSeat();
-
     do
     {
-        cout << "\n--- Theater Ticket Booking ---\n";
-        cout << "1. Display Available Seats\n";
-        cout << "2. Book Seat\n";
-        cout << "3. Cancel Booking\n";
-        cout << "4. Exit\n";
+        cout << "\n--- Theater Ticket Booking System ---\n";
+        cout << "1. Display available seats\n";
+        cout << "2. Book a seat\n";
+        cout << "3. Cancel a booking\n";
+        cout << "4. Display all seat statuses\n";
+        cout << "0. Exit\n";
         cout << "Enter choice: ";
         cin >> choice;
 
@@ -213,22 +212,34 @@ int main()
             break;
 
         case 2:
-            t.bookSeat();
+            cout << "Enter row number: ";
+            cin >> row;
+            cout << "Enter seat number: ";
+            cin >> seatNo;
+            t.bookSeat(row, seatNo);
             break;
 
         case 3:
-            t.cancelBooking();
+            cout << "Enter row number: ";
+            cin >> row;
+            cout << "Enter seat number: ";
+            cin >> seatNo;
+            t.cancelBooking(row, seatNo);
             break;
 
         case 4:
-            cout << "Exiting...";
+            t.displayAllSeats();
+            break;
+
+        case 0:
+            cout << "Exiting system.\n";
             break;
 
         default:
             cout << "Invalid choice.\n";
         }
 
-    } while (choice != 4);
+    } while (choice != 0);
 
     return 0;
 }

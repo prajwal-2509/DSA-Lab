@@ -1,3 +1,7 @@
+/*Assignment 5 – Part A
+Program: Check Whether an Expression is Well-Parenthesized Using Stack
+
+This C++ program uses a Stack to check whether opening and closing symbols (), {}, and [] are properly matched and nested.*/
 
 #include <iostream>
 #include <string>

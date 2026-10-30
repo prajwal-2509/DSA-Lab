@@ -2,7 +2,8 @@
 #include <iostream>
 using namespace std;
 
-struct Seat {
+class Seat {
+    public:
     int seatNo;
     bool booked;
     Seat* next;

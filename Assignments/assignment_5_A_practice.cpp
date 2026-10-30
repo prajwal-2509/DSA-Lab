@@ -1,60 +1,86 @@
 #include <iostream>
 #include <vector>
+#include <string>
+
 
 using namespace std;
 
+
 class Stack{
-    vector <char> arr;
+
+    vector<char> stack;
     public:
 
-    void push(string s){
-    for(int i = 0; i < s.length(); i++){
-        arr.push_back(s.at(i));
-    }
-    cout << "String pushed on Stack !";
-}
-
-    void display(){
-        if(arr.empty()){
-            cout<<"The stack is empty! ";
-            return;
-        }
-
-        for(int i=arr.size()-1;i>=0;i--){
-            cout<<arr.at(i)<<" ";
+        void push(char ch){
+            stack.push_back(ch);
 
         }
-    }
 
-    char pop() {
-    if (arr.empty()) {
-        cout << "Stack Underflow! ";
-        return '\0'; 
-    }
-    char popped_val = arr.back(); 
-    arr.pop_back();               
-    return popped_val;
-}
+        void pop(){
+            if(stack.empty()){
+                cout<<"underflow ";
+                return;
+            }
 
-    // int pop(){
+            stack.pop_back();
+        }
 
-    // }
+        char peek(){
+            if(stack.empty()){
+                cout<<"underflow ";
+                return '\0';
+            }
+
+            return stack.back();
+        }
+
+        bool isEmpty(){
+            return stack.empty();
+        }
+
+        bool chechexp(string exp){
+            bool balance=true;
+            Stack s;
+
+            for(int i=0;i<exp.length();i++){
+                char ch=exp[i];
+                if(ch == '(' || ch=='{' || ch=='['){
+                    s.push(ch);
+                }
+                else if(ch==')' || ch=='}' || ch==']') {
+                        if(s.isEmpty()){
+                            balance=false;
+                            break;
+
+                        }
+
+                        char top= s.peek();
+
+                        if (ch=='}' && top=='{' || ch==']' && top=='['  || ch==')' && top=='('  ){
+                            s.pop();
+                        }
+
+                        else{
+                            balance=false;
+                            break;
+
+                        }
+                }
+            }
+
+            if(!s.isEmpty()){
+                balance=false;
+            }
+
+            return balance;
+        }
 };
+int main() 
+    {
 
+        Stack check;
+        string exp="({a+b})";
 
-int main(){
-
-    Stack s;
-    string str;
-    cout<<"Enter the expression : ";
-    getline(cin,str);
-
-    s.push(str);
-    s.display();
-
-    cout << "\nPopped element: " << s.pop() << "\n";
-    cout<<"Other elements on stack : \n";
-    s.display();
-
+        cout<< exp << (check.chechexp(exp) ? "Balanced ": "not balance")<<endl;
     return 0;
 }

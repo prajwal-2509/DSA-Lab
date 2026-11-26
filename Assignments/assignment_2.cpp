@@ -36,13 +36,18 @@ class Sorting{
             }
 
             for(int i=0;i<n-1;i++){
+                 bool swapped = false;
                 for(int j=0;j<n-i-1;j++){
                     if(temp[j].id > temp[j+1].id){
                         swap(temp[j],temp[j+1]);
+                        swapped = true;
                     }
                 }
                 cout<<"\nPass "<<i+1<<":\n";
                 display(temp,n);
+                if(!swapped){
+                    break;
+                }
             }
 
             cout<<"\nSorted by Product ID (Increasing):\n";

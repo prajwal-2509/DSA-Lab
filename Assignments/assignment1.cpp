@@ -128,7 +128,7 @@ public:
         int n = products.size();
         int a = 0;
         int b = 1;
-        int c = 1;
+        int c = a+b;
         int offset = -1;
 
         while(c < n) {

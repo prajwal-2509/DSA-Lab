@@ -34,6 +34,8 @@ class BST {
         return r;
     }
 
+       
+
     Node* search(Node *r, string name) {
         if (r == nullptr || r->name == name)
             return r;
@@ -122,12 +124,16 @@ class BST {
         return r;
     }
 
+            
+
     void destroy(Node *r) {
         if (r == nullptr) return;
         destroy(r->left);
         destroy(r->right);
         delete r;
     }
+
+   
 
 public:
     BST() {
@@ -142,12 +148,126 @@ public:
         root = insert(root, name);
     }
 
+         void insertNonRecursive(string name) {
+        Node *newNode = new Node(name);
+
+        if (root == nullptr) {
+            root = newNode;
+            return;
+        }
+
+        Node *temp = root;
+        Node *parent = nullptr;
+
+        while (temp != nullptr) {
+            parent = temp;
+
+            if (name < temp->name)
+                temp = temp->left;
+            else if (name > temp->name)
+                temp = temp->right;
+            else {
+                cout << "File or folder already exists.\n";
+                delete newNode;
+                return;
+            }
+        }
+
+        if (name < parent->name)
+            parent->left = newNode;
+        else
+            parent->right = newNode;
+    }
+
+                void deleteNonRecursive(string name) {
+            Node *temp = root, *parent = nullptr;
+
+            while (temp != nullptr && temp->name != name) {
+                parent = temp;
+
+                if (name < temp->name)
+                    temp = temp->left;
+                else
+                    temp = temp->right;
+            }
+
+            if (temp == nullptr) {
+                cout << "File or folder not found.\n";
+                return;
+            }
+
+            if (temp->left == nullptr || temp->right == nullptr) {
+                Node *child;
+
+                if (temp->left != nullptr)
+                    child = temp->left;
+                else
+                    child = temp->right;
+
+                if (parent == nullptr)
+                    root = child;
+                else if (parent->left == temp)
+                    parent->left = child;
+                else
+                    parent->right = child;
+
+                delete temp;
+            }
+            else {
+                Node *p = temp;
+                Node *successor = temp->right;
+
+                while (successor->left != nullptr) {
+                    p = successor;
+                    successor = successor->left;
+                }
+
+                temp->name = successor->name;
+
+                if (p->left == successor)
+                    p->left = successor->right;
+                else
+                    p->right = successor->right;
+
+                delete successor;
+            }
+
+            cout << "File or folder deleted.\n";
+        }
+
     void search(string name) {
         if (search(root, name))
             cout << "File or folder found.\n";
         else
             cout << "File or folder not found.\n";
     }
+
+        int countNodes(Node *r) {
+            if (r == nullptr)
+                return 0;
+
+            return 1 + countNodes(r->left) + countNodes(r->right);
+        }
+
+        void displayTotalNodes() {
+            cout << "Total nodes: " << countNodes(root) << endl;
+        }
+
+
+        int countLeafNodes(Node *r) {
+            if (r == nullptr)
+                return 0;
+
+            if (r->left == nullptr && r->right == nullptr)
+                return 1;
+
+            return countLeafNodes(r->left) + countLeafNodes(r->right);
+        }
+
+        void displayLeafCount() {
+            cout << "Total leaf nodes: " << countLeafNodes(root) << endl;
+        }
+
 
     void deleteFile(string name) {
         if (search(root, name)) {
@@ -228,9 +348,34 @@ public:
         cout << endl;
     }
 
+    
+        int maxDepthNonRecursive() {
+        if (root == nullptr) return 0;
+
+        queue<Node*> q;
+        q.push(root);
+        int depth = 0;
+
+        while (!q.empty()) {
+            int count = q.size();
+            depth++;
+
+            for (int i = 0; i < count; i++) {
+                Node *r = q.front();
+                q.pop();
+
+                if (r->left) q.push(r->left);
+                if (r->right) q.push(r->right);
+            }
+        }
+
+        return depth;
+    }
+
     void displayDepth() {
         cout << "Maximum depth: " << depth(root) << endl;
     }
+    
 
     void displayLeafNodes() {
         cout << "Files/folders without children: ";
@@ -261,6 +406,21 @@ public:
             if (r->right) q.push(r->right);
         }
         cout << endl;
+    }   
+
+
+        void findMaximum() {
+        if (root == nullptr) {
+            cout << "Tree is empty.\n";
+            return;
+        }
+
+        Node *temp = root;
+
+        while (temp->right != nullptr)
+            temp = temp->right;
+
+        cout << "Maximum value: " << temp->name << endl;
     }
 };
 
@@ -271,16 +431,23 @@ int main() {
 
     do {
         cout << "\n--- File and Folder Hierarchy ---\n";
-        cout << "1. Insert file/folder\n";
+        cout << "1. Insert file/folder (Recursive)\n";
         cout << "2. Recursive traversals\n";
         cout << "3. Non-recursive traversals\n";
-        cout << "4. Maximum depth\n";
+        cout << "4. Maximum depth (Recursive)\n";
         cout << "5. Display files/folders without children\n";
         cout << "6. Create mirror image\n";
         cout << "7. Search file/folder\n";
-        cout << "8. Delete file/folder\n";
+        cout << "8. Delete file/folder (Recursive)\n";
         cout << "9. Display level order\n";
-        cout << "10. Exit\n";
+        cout << "10. Non-recursive insertion\n";
+        cout << "11. Non-recursive deletion\n";
+        cout << "12. Count total nodes\n";
+        cout << "13. Count leaf nodes\n";
+        cout << "14. Find maximum value\n";
+        cout << "15. Exit\n";
+        cout << "16. Maximum depth (Non-Recursive)\n";
+
         cout << "Enter choice: ";
         cin >> choice;
 
@@ -343,13 +510,45 @@ int main() {
                 break;
 
             case 10:
+                cout << "Enter file/folder name: ";
+                cin >> ws;
+                getline(cin, name);
+                tree.insertNonRecursive(name);
+                break;
+
+            case 11:
+                cout << "Enter file/folder name to delete: ";
+                cin >> ws;
+                getline(cin, name);
+                tree.deleteNonRecursive(name);
+                break;
+
+            case 12:
+                tree.displayTotalNodes();
+                break;
+
+            case 13:
+                tree.displayLeafCount();
+                break;
+
+            case 14:
+                tree.findMaximum();
+                break;
+
+            case 15:
                 cout << "Exiting...\n";
+                break;
+
+            case 16:
+                cout << "Maximum depth (Non-Recursive): "
+                     << tree.maxDepthNonRecursive() << endl;
                 break;
 
             default:
                 cout << "Invalid choice.\n";
         }
-    } while (choice != 10);
+
+    } while (choice != 15);
 
     return 0;
 }

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 using namespace std;
 class Node
 {
@@ -33,7 +34,8 @@ public:
         cin >> prn;
 
         cout << "Enter Name: ";
-        cin >> name;
+        cin.ignore();
+        getline(cin, name);
 
         Node *newNode = new Node;
 
@@ -131,21 +133,25 @@ public:
         return count;
     }
 
-    void concatenate(Club &second)
-    {
-        if (head == NULL)
+        void concatenate(Club &second)
         {
-            head = second.head;
-            return;
+            if (head == NULL)
+            {
+                head = second.head;
+                second.head = NULL;
+                return;
+            }
+
+            Node *temp = head;
+
+            while (temp->next != NULL)
+                temp = temp->next;
+
+            temp->next = second.head;
+            second.head = NULL;
+
+            cout << "Lists concatenated successfully!";
         }
-
-        Node *temp = head;
-
-        while (temp->next != NULL)
-            temp = temp->next;
-
-        temp->next = second.head;
-    }
 };
 
 int main()

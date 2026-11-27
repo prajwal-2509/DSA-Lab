@@ -1,6 +1,6 @@
+
 #include <iostream>
 #include <vector>
-#include <unordered_map>
 #include <algorithm>
 using namespace std;
 
@@ -10,6 +10,13 @@ public:
     int code;
     string name;
     double price;
+
+    Product()
+    {
+        code = 0;
+        name = "";
+        price = 0;
+    }
 
     Product(int c, string n, double p)
     {
@@ -22,7 +29,10 @@ public:
 class GroceryStore
 {
     vector<Product> products;
-    unordered_map<int, Product> hashTable;
+
+    Product hashTable[20];
+    bool occupied[20] = {false};
+    int size = 20;
 
 public:
     void inputProducts()
@@ -50,7 +60,6 @@ public:
             Product p(code, name, price);
 
             products.push_back(p);
-            hashTable.insert({code, p});
         }
     }
 
@@ -184,6 +193,82 @@ public:
         return -1;
     }
 
+    int hashFunction(int key)
+    {
+        return key % size;
+    }
+
+    void insertHash()
+    {
+        for (int i = 0; i < products.size(); i++)
+        {
+            int index = hashFunction(products[i].code);
+            int start = index;
+
+            while (occupied[index])
+            {
+                index = (index + 1) % size;
+
+                if (index == start)
+                {
+                    cout << "Hash table is full\n";
+                    return;
+                }
+            }
+
+            hashTable[index] = products[i];
+            occupied[index] = true;
+        }
+    }
+
+    void hashSearch(int key)
+    {
+        int index = hashFunction(key);
+        int start = index;
+
+        while (occupied[index])
+        {
+            if (hashTable[index].code == key)
+            {
+                cout << "\nHashing with Linear Probing\n";
+                cout << "Product Code: " << hashTable[index].code << endl;
+                cout << "Product: " << hashTable[index].name << endl;
+                cout << "Price: Rs. " << hashTable[index].price << endl;
+                return;
+            }
+
+            index = (index + 1) % size;
+
+            if (index == start)
+                break;
+        }
+
+        cout << "Product not found\n";
+    }
+
+    void displayHash()
+    {
+        cout << "\nHash Table:\n";
+
+        for (int i = 0; i < size; i++)
+        {
+            cout << i << " --> ";
+
+            if (occupied[i])
+            {
+                cout << hashTable[i].code << " "
+                     << hashTable[i].name << " "
+                     << hashTable[i].price;
+            }
+            else
+            {
+                cout << "Empty";
+            }
+
+            cout << endl;
+        }
+    }
+
     void result(string type, int i)
     {
         cout << "\n" << type << endl;
@@ -199,23 +284,6 @@ public:
         cout << "Price: Rs. " << products[i].price << endl;
     }
 
-    void hashSearch(int key)
-    {
-        auto x = hashTable.find(key);
-
-        cout << "\nHashing\n";
-
-        if (x == hashTable.end())
-        {
-            cout << "Product not found\n";
-            return;
-        }
-
-        cout << "Product Code: " << x->second.code << endl;
-        cout << "Product: " << x->second.name << endl;
-        cout << "Price: Rs. " << x->second.price << endl;
-    }
-
     void searchProduct()
     {
         int choice;
@@ -224,17 +292,24 @@ public:
 
         while (true)
         {
-            cout << "\n1. Linear Search";
+            cout << "\n--- PRODUCT SEARCH MENU ---\n";
+            cout << "1. Linear Search";
             cout << "\n2. Sentinel Search";
             cout << "\n3. Binary Search";
             cout << "\n4. Fibonacci Search";
-            cout << "\n5. Hashing";
+            cout << "\n5. Hashing with Linear Probing";
             cout << "\n6. Exit";
             cout << "\nEnter choice: ";
             cin >> choice;
 
             if (choice == 6)
                 break;
+
+            if (choice < 1 || choice > 5)
+            {
+                cout << "Invalid choice\n";
+                continue;
+            }
 
             cout << "\nEnter product code: ";
             cin >> key;
@@ -265,10 +340,6 @@ public:
             {
                 hashSearch(key);
             }
-            else
-            {
-                cout << "Invalid choice\n";
-            }
         }
     }
 };
@@ -278,8 +349,13 @@ int main()
     GroceryStore store;
 
     store.inputProducts();
+
+    store.insertHash();
+    store.displayHash();
+
     store.sortProducts();
     store.displayBill();
+
     store.searchProduct();
 
     return 0;
